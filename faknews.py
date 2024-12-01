@@ -36,15 +36,27 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    user_input = request.form['news_article']
-    with open('model.pkl', 'rb') as f:
-        model = pickle.load(f)
-    prediction = model.predict([user_input])
-    if prediction[0] == 0:
-        result = "The news is likely to be true."
-    else:
-        result = "The news is likely to be fake."
-    return render_template('result.html', prediction=result)
+    try:
+        # Get the user input from the form
+        user_input = request.form['news_article']
+        print(f"User Input: {user_input}")
+        
+        # Load the trained model
+        with open('model.pkl', 'rb') as f:
+            model = pickle.load(f)
+
+        # Make prediction using the model
+        prediction = model.predict([user_input])
+        print(f"Prediction: {prediction}")
+        
+        # Determine the result based on prediction
+        result = "The news is likely to be true." if prediction[0] == 0 else "The news is likely to be fake."
+
+        # Return the result to the user
+        return render_template('result.html', prediction=result)
+    except Exception as e:
+        print(f"Error: {e}")
+        return "An error occurred. Please check the server logs.", 500
 
 if __name__ == "__main__":
     app.run(debug=True)
